@@ -147,6 +147,7 @@ dependencies {
     debugApi "org.videolan.android:libvlc-all:$rootProject.ext.libvlcVersion"
     releaseApi "org.videolan.android:libvlc-all:$rootProject.ext.libvlcVersion"
     signedReleaseApi "org.videolan.android:libvlc-all:$rootProject.ext.libvlcVersion"
+    api project(':application:libvlc')
     api project(':application:tools')
     api project(':application:resources')
     api project(':application:live-plot-graph')
