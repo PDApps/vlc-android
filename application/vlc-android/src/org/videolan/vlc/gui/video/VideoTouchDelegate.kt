@@ -79,8 +79,6 @@ class VideoTouchDelegate(private val player: VideoPlayerActivity,
     //Seek
     private var nbTimesTaped = 0
     private var lastSeekWasForward = true
-    private var seekAnimRunning = false
-    private var animatorSet: AnimatorSet = AnimatorSet()
     private val rightContainer: CircularRevealFrameLayout by lazy { player.findViewById(R.id.rightContainer) }
     private val leftContainer: CircularRevealFrameLayout by lazy { player.findViewById(R.id.leftContainer) }
     private val rightContainerBackground: HalfCircleView by lazy { player.findViewById(R.id.rightContainerBackground) }
@@ -481,7 +479,6 @@ class VideoTouchDelegate(private val player: VideoPlayerActivity,
 
             initSeekOverlay()
             if (lastSeekWasForward != seekForward) {
-                animatorSet.cancel()
                 hideSeekOverlay(true)
             }
 
@@ -529,54 +526,11 @@ class VideoTouchDelegate(private val player: VideoPlayerActivity,
                     seekTVConstraintSet.applyTo(seekContainer)
                 }
 
-                val backgroundAnim = ObjectAnimator.ofFloat(seekBackground, "alpha", 1f)
-                backgroundAnim.duration = 200
-
-                val firstImageAnim = ObjectAnimator.ofFloat(imageFirst, "alpha", 1f, 0f)
-                firstImageAnim.duration = 500
-
-                val secondImageAnim = ObjectAnimator.ofFloat(imageSecond, "alpha", 0F, 1f, 0f)
-                secondImageAnim.duration = 750
-
-                //the center is offset + the radius is 2 * the width to reveal an arc instead of half a circle
-                val cx = if (seekForward) container.width * 2 else -container.width
-                val cy = container.height / 2
-                animatorSet = AnimatorSet()
-                val backgroundColorAnimator = CircularRevealCompat.createCircularReveal(container, cx.toFloat(), cy.toFloat(), 0F, container.width.toFloat() * 2)
-                backgroundColorAnimator.duration = 750
-
-                val containerBackgroundAnim = ObjectAnimator.ofFloat(containerBackground, "alpha", 0f, 1f)
-                containerBackgroundAnim.duration = 300
-
-                val textAnim = ObjectAnimator.ofFloat(textView, "alpha", 0f, 1f)
-                textAnim.duration = 300
-
-                val anims: ArrayList<Animator> = arrayListOf(firstImageAnim, secondImageAnim)
-                if (!isTv) {
-                    anims.add(backgroundColorAnimator)
-                }
-                if (!seekAnimRunning) {
-                    anims.add(containerBackgroundAnim)
-                }
-                if (!seekAnimRunning) {
-                    anims.add(textAnim)
-                }
-
-                seekAnimRunning = true
-
-                seekRightText.animate().cancel()
-                seekLeftText.animate().cancel()
-                rightContainerBackground.animate().cancel()
-                leftContainerBackground.animate().cancel()
-
-                animatorSet.playTogether(anims)
-
-                val mainAnimOut = ObjectAnimator.ofFloat(seekBackground, "alpha", 0f)
-                backgroundAnim.duration = 200
-
-                val seekAnimatorSet = AnimatorSet()
-                seekAnimatorSet.playSequentially(animatorSet, mainAnimOut)
-
+                seekBackground.alpha = 1f
+                imageFirst.alpha = 1f
+                imageSecond.alpha = 1f
+                containerBackground.alpha = 1f
+                textView.alpha = 1f
 
                 player.handler.removeMessages(VideoPlayerActivity.HIDE_SEEK)
                 player.handler.sendEmptyMessageDelayed(VideoPlayerActivity.HIDE_SEEK, SEEK_TIMEOUT)
@@ -584,7 +538,6 @@ class VideoTouchDelegate(private val player: VideoPlayerActivity,
                 if (!isTv) {
                     container.visibility = View.VISIBLE
                 }
-                seekAnimatorSet.start()
             }
             textView.text = sb.toString()
         }
@@ -592,7 +545,6 @@ class VideoTouchDelegate(private val player: VideoPlayerActivity,
 
     fun hideSeekOverlay(immediate: Boolean = false) {
         if (BuildConfig.DEBUG) Log.d(this::class.java.simpleName, "hideSeekOverlay $immediate")
-        seekAnimRunning = false
         rightContainer.visibility = View.INVISIBLE
         leftContainer.visibility = View.INVISIBLE
         if (immediate) {
