@@ -370,12 +370,12 @@ open class PlaylistManager(val service: PlaybackService) : MediaWrapperList.Even
         val mw = mediaList.getMedia(index) ?: return
         val isVideoPlaying = mw.type == MediaWrapper.TYPE_VIDEO && player.isVideoPlaying()
         if (!videoBackground && isVideoPlaying) mw.addFlags(MediaWrapper.MEDIA_VIDEO)
-        if (videoBackground) mw.addFlags(MediaWrapper.MEDIA_FORCE_AUDIO)
         if (isBenchmark) mw.addFlags(MediaWrapper.MEDIA_BENCHMARK)
         parsed = false
         player.switchToVideo = false
         if (mw.uri.scheme == "content") withContext(Dispatchers.IO) { MediaUtils.retrieveMediaTitle(mw) }
 
+        val isAudio = mw.type == MediaWrapper.TYPE_AUDIO
         if (mw.type != MediaWrapper.TYPE_VIDEO || isVideoPlaying || player.hasRenderer
                 || mw.hasFlag(MediaWrapper.MEDIA_FORCE_AUDIO)) {
             var uri = withContext(Dispatchers.IO) { FileUtils.getUri(mw.uri) }
@@ -383,8 +383,7 @@ open class PlaylistManager(val service: PlaybackService) : MediaWrapperList.Even
                 skipMedia()
                 return
             }
-            //PiP TV
-            if (!isBenchmark && AndroidDevices.isTv && isVideoPlaying) {
+            if (!isBenchmark && isAudio) {
                 VideoPlayerActivity.startOpened(ctx, mw.uri, currentIndex)
             }
             val title = mw.getMetaLong(MediaWrapper.META_TITLE)

@@ -86,6 +86,7 @@ import org.videolan.tools.*
 import org.videolan.vlc.BuildConfig
 import org.videolan.vlc.PlaybackService
 import org.videolan.vlc.R
+import org.videolan.vlc.StartActivity
 import org.videolan.vlc.gui.DialogActivity
 import org.videolan.vlc.gui.audio.EqualizerFragment
 import org.videolan.vlc.gui.dialogs.PlaybackSpeedDialog
@@ -417,9 +418,12 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
         /* Loading view */
         loadingImageView = findViewById(R.id.player_overlay_loading)
         overlayDelegate.dimStatusBar(true)
-        handler.sendEmptyMessageDelayed(LOADING_ANIMATION, LOADING_ANIMATION_DELAY.toLong())
 
         switchingView = intent.hasExtra(SWITCHING_VIEW)
+        if (!switchingView) {
+            handler.sendEmptyMessageDelayed(LOADING_ANIMATION, LOADING_ANIMATION_DELAY.toLong())
+            isPlaying = true
+        }
 
         askResume = settings.getString(KEY_VIDEO_CONFIRM_RESUME, "0") == "2"
         sDisplayRemainingTime = settings.getBoolean(KEY_REMAINING_TIME_DISPLAY, false)
@@ -793,17 +797,21 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
                 } else
                     vlcVout.detachViews()
             }
-            val mediaPlayer = mediaplayer
             if (!displayManager.isOnRenderer) videoLayout?.let {
-                mediaPlayer.attachViews(it, displayManager, true, false)
-                val size = if (isBenchmark) MediaPlayer.ScaleType.SURFACE_FILL else MediaPlayer.ScaleType.values()[settings.getInt(VIDEO_RATIO, MediaPlayer.ScaleType.SURFACE_BEST_FIT.ordinal)]
-                mediaPlayer.videoScale = size
+                attachVideoLayout()
             }
 
             initUI()
 
             loadMedia()
         }
+    }
+
+    private fun attachVideoLayout() {
+        val mediaPlayer = service!!.mediaplayer
+        mediaPlayer.attachViews(videoLayout!!, displayManager, true, false)
+        val size = if (isBenchmark) MediaPlayer.ScaleType.SURFACE_FILL else MediaPlayer.ScaleType.values()[settings.getInt(VIDEO_RATIO, MediaPlayer.ScaleType.SURFACE_BEST_FIT.ordinal)]
+        mediaPlayer.videoScale = size
     }
 
     private fun initUI() {
@@ -2084,8 +2092,14 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
                 savedMediaList = null
             }
             //We may not have the permission to access files
-            if (!switchingView)
+            if (!switchingView || !service.hasMedia())
                 handler.sendEmptyMessage(START_PLAYBACK)
+            else {
+                attachVideoLayout()
+                playbackStarted = true
+                service.showNotification()
+            }
+
             switchingView = false
             handler.post {
                 // delay mediaplayer loading, prevent ANR
@@ -2197,7 +2211,13 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
         }
 
         fun getIntent(action: String, context: Context, uri: Uri, title: String?, fromStart: Boolean, openedPosition: Int): Intent {
-            val intent = Intent(context, VideoPlayerActivity::class.java)
+            val appContext = AppContextProvider.appContext
+            val playerClass = if (appContext is StartActivity.ClassProvider) {
+                appContext.playerClass
+            } else {
+                VideoPlayerActivity::class.java
+            }
+            val intent = Intent(context, playerClass)
             intent.action = action
             intent.putExtra(PLAY_EXTRA_ITEM_LOCATION, uri)
             intent.putExtra(PLAY_EXTRA_ITEM_TITLE, title)
