@@ -2090,8 +2090,10 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
             //We may not have the permission to access files
             if (!switchingView)
                 handler.sendEmptyMessage(START_PLAYBACK)
-            else
+            else {
                 attachVideoLayout()
+                playbackStarted = true
+            }
 
             switchingView = false
             handler.post {
