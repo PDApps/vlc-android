@@ -2093,6 +2093,7 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
             else {
                 attachVideoLayout()
                 playbackStarted = true
+                service.showNotification()
             }
 
             switchingView = false
