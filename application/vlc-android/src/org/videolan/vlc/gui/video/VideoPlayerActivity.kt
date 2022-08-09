@@ -86,6 +86,7 @@ import org.videolan.tools.*
 import org.videolan.vlc.BuildConfig
 import org.videolan.vlc.PlaybackService
 import org.videolan.vlc.R
+import org.videolan.vlc.StartActivity
 import org.videolan.vlc.gui.DialogActivity
 import org.videolan.vlc.gui.audio.EqualizerFragment
 import org.videolan.vlc.gui.dialogs.PlaybackSpeedDialog
@@ -2210,7 +2211,13 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
         }
 
         fun getIntent(action: String, context: Context, uri: Uri, title: String?, fromStart: Boolean, openedPosition: Int): Intent {
-            val intent = Intent(context, VideoPlayerActivity::class.java)
+            val appContext = AppContextProvider.appContext
+            val playerClass = if (appContext is StartActivity.ClassProvider) {
+                appContext.playerClass
+            } else {
+                VideoPlayerActivity::class.java
+            }
+            val intent = Intent(context, playerClass)
             intent.action = action
             intent.putExtra(PLAY_EXTRA_ITEM_LOCATION, uri)
             intent.putExtra(PLAY_EXTRA_ITEM_TITLE, title)
