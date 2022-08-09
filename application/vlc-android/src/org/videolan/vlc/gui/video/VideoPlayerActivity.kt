@@ -2091,7 +2091,7 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
                 savedMediaList = null
             }
             //We may not have the permission to access files
-            if (!switchingView)
+            if (!switchingView || !service.hasMedia())
                 handler.sendEmptyMessage(START_PLAYBACK)
             else {
                 attachVideoLayout()
