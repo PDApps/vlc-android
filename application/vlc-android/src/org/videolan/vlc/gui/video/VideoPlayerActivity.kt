@@ -759,14 +759,14 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
 
     private fun saveBrightness() {
         // Save brightness if user wants to
-        if (settings.getBoolean(SAVE_BRIGHTNESS, false)) {
+        if (settings.getBoolean(SAVE_BRIGHTNESS, true)) {
             val brightness = window.attributes.screenBrightness
             if (brightness != -1f) settings.putSingle(BRIGHTNESS_VALUE, brightness)
         }
     }
 
     private fun restoreBrightness() {
-        if (settings.getBoolean(SAVE_BRIGHTNESS, false)) {
+        if (settings.getBoolean(SAVE_BRIGHTNESS, true)) {
             val brightness = settings.getFloat(BRIGHTNESS_VALUE, -1f)
             if (brightness != -1f) setWindowBrightness(brightness)
         }
