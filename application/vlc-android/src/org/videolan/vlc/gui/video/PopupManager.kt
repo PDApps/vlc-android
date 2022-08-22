@@ -219,7 +219,7 @@ class PopupManager constructor(private val service: PlaybackService) : PlaybackS
     }
 
     private fun expandToVideoPlayer() {
-        removePopup()
+        service.removePopup()
         if (service.hasMedia() && !service.isPlaying)
             service.currentMediaWrapper!!.flags = MediaWrapper.MEDIA_PAUSED
         service.switchToVideo()
