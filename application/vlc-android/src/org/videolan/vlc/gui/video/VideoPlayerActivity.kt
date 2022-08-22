@@ -643,7 +643,6 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
             outState.putParcelableArrayList(KEY_MEDIA_LIST, ArrayList(mediaList))
             savedMediaList = null
         }
-        videoUri = null
         outState.putBoolean(KEY_LIST, overlayDelegate.hasPlaylist)
     }
 

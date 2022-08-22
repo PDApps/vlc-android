@@ -438,8 +438,9 @@ open class PlaylistManager(val service: PlaybackService) : MediaWrapperList.Even
     @MainThread
     fun switchToVideo(): Boolean {
         val media = getCurrentMedia()
-        if (media === null || media.hasFlag(MediaWrapper.MEDIA_FORCE_AUDIO) || !player.canSwitchToVideo())
+        if (media === null || !player.canSwitchToVideo())
             return false
+        media.removeFlags(MediaWrapper.MEDIA_FORCE_AUDIO)
         val hasRenderer = player.hasRenderer
         videoBackground = false
         showAudioPlayer.postValue(false)
