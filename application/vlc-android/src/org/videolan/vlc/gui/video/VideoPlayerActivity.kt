@@ -105,7 +105,6 @@ import org.videolan.vlc.util.FileUtils
 import org.videolan.vlc.viewmodels.BookmarkModel
 import org.videolan.vlc.viewmodels.PlaylistModel
 import java.lang.Runnable
-import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
 
 interface ServiceLauncher {
@@ -183,7 +182,6 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
     val overlayDelegate: VideoPlayerOverlayDelegate by lazy(LazyThreadSafetyMode.NONE) { createVideoPlayerOverlayDelegate() }
     val resizeDelegate: VideoPlayerResizeDelegate by lazy(LazyThreadSafetyMode.NONE) { VideoPlayerResizeDelegate(this@VideoPlayerActivity) }
     private val playerKeyListenerDelegate: PlayerKeyListenerDelegate by lazy(LazyThreadSafetyMode.NONE) { PlayerKeyListenerDelegate(this@VideoPlayerActivity) }
-    val tipsDelegate: VideoTipsDelegate by lazy(LazyThreadSafetyMode.NONE) { VideoTipsDelegate(this@VideoPlayerActivity) }
 
     private val dialogsDelegate = DialogDelegate()
     private var baseContextWrappingDelegate: AppCompatDelegate? = null
@@ -447,18 +445,6 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
             Log.w(TAG, "onCreate: failed to set orientation")
         }
         overlayDelegate.updateOrientationIcon()
-
-        // Extra initialization when no secondary display is detected
-        if (displayManager.isPrimary) {
-            // Orientation
-            // Tips
-            if (!BuildConfig.DEBUG && !settings.getBoolean(PREF_TIPS_SHOWN, false)
-                && !isBenchmark
-            ) {
-                tipsDelegate.init()
-            }
-        }
-
 
         medialibrary = Medialibrary.getInstance()
         val dm = DisplayMetrics()
@@ -1457,7 +1443,6 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
                 setPictureInPictureParams(PictureInPictureParams.Builder().setAspectRatio(ar).build())
             }
         }
-        if (tipsDelegate.currentTip != null) pause()
     }
 
     private fun encounteredError() {
@@ -2034,14 +2019,6 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
         isLoading = false
         loadingImageView.setInvisible()
         loadingImageView?.clearAnimation()
-    }
-
-    fun onClickDismissTips(@Suppress("UNUSED_PARAMETER") v: View) {
-        tipsDelegate.close()
-    }
-
-    fun onClickNextTips(@Suppress("UNUSED_PARAMETER") v: View?) {
-        tipsDelegate.next()
     }
 
     fun updateNavStatus() {

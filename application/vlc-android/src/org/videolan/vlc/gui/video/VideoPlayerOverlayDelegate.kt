@@ -382,7 +382,6 @@ open class VideoPlayerOverlayDelegate (private val player: VideoPlayerActivity) 
      */
     fun showOverlayTimeout(timeout: Int) {
         player.service?.let { service ->
-            if (player.tipsDelegate.currentTip != null) return
             if (player.isInPictureInPictureMode) return
             initOverlay()
             if (!::hudBinding.isInitialized) return

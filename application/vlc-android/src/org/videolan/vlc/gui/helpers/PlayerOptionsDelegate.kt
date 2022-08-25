@@ -48,9 +48,6 @@ private const val ID_PASSTHROUGH = 12L
 private const val ID_ABREPEAT = 13L
 private const val ID_LOCK_PLAYER = 14L
 private const val ID_VIDEO_STATS = 15L
-private const val ID_SHOW_VIDEO_TIPS = 16L
-private const val ID_SHOW_AUDIO_TIPS = 17L
-private const val ID_SHOW_PLAYLIST_TIPS = 18L
 private const val ID_VIDEO_CONTROLS_SETTING = 19L
 private const val ID_AUDIO_CONTROLS_SETTING = 20L
 @ObsoleteCoroutinesApi
@@ -104,7 +101,6 @@ open class PlayerOptionsDelegate(val activity: FragmentActivity, val service: Pl
         if (!Settings.showTvUi) {
             if (video) {
             options.add(PlayerOption(ID_VIDEO_CONTROLS_SETTING, R.drawable.ic_video_controls, res.getString(R.string.controls_setting)))
-            options.add(PlayerOption(ID_SHOW_VIDEO_TIPS, R.drawable.ic_videotips, res.getString(R.string.tips_title)))
             } else {
             options.add(PlayerOption(ID_AUDIO_CONTROLS_SETTING, R.drawable.ic_audio_controls, res.getString(R.string.controls_setting)))
             }
@@ -174,10 +170,6 @@ open class PlayerOptionsDelegate(val activity: FragmentActivity, val service: Pl
             ID_VIDEO_STATS -> {
                 hide()
                 service.playlistManager.toggleStats()
-            }
-            ID_SHOW_VIDEO_TIPS -> {
-                hide()
-                (activity as VideoPlayerActivity).tipsDelegate.init()
             }
             ID_BOOKMARK -> {
                 hide()
