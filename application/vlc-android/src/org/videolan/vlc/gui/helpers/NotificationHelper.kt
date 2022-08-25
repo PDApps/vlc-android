@@ -26,6 +26,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
@@ -42,7 +44,6 @@ import org.videolan.tools.Settings
 import org.videolan.tools.getContextWithLocale
 import org.videolan.tools.hasFlag
 import org.videolan.vlc.R
-import org.videolan.vlc.media.MediaUtils.getMediaDescription
 import kotlin.math.abs
 
 private const val MEDIALIBRRARY_CHANNEL_ID = "vlc_medialibrary"
@@ -56,8 +57,8 @@ object NotificationHelper {
 
     private val notificationIntent = Intent()
 
-    fun createPlaybackNotification(ctx: Context, video: Boolean, title: String,
-                                   cover: Bitmap?, playing: Boolean, pausable: Boolean,
+    fun createPlaybackNotification(ctx: Context, title: String,
+                                   playing: Boolean, pausable: Boolean,
                                    seekable: Boolean, speed: Float, podcastMode: Boolean,
                                    seekInCompactView: Boolean, enabledActions: Long,
                                    sessionToken: MediaSessionCompat.Token?,
@@ -65,7 +66,11 @@ object NotificationHelper {
 
         val piStop = MediaButtonReceiver.buildMediaButtonPendingIntent(ctx, PlaybackStateCompat.ACTION_STOP)
         val builder = NotificationCompat.Builder(ctx, PLAYBACK_SERVICE_CHANNEL_ID)
-        builder.setSmallIcon(if (video) R.drawable.ic_notif_video else R.drawable.ic_notif_audio)
+        val packageManager: PackageManager = ctx.packageManager
+        val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
+        val appIconResId: Int = applicationInfo.icon
+        val cover = ctx.getBitmapFromDrawable(appIconResId)
+        builder.setSmallIcon(appIconResId)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentTitle(title)
                 .setLargeIcon(cover)

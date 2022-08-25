@@ -706,8 +706,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), LifecycleOwner, Corout
         val notification = if (this::notification.isInitialized && !stopped) notification
         else {
             val pi = if (::playlistManager.isInitialized) sessionPendingIntent else null
-            NotificationHelper.createPlaybackNotification(ctx, false,
-                    ctx.resources.getString(R.string.loading), null, false, true,
+            NotificationHelper.createPlaybackNotification(ctx,
+                    ctx.resources.getString(R.string.loading), false, true,
                     true, speed, isPodcastMode, false, enabledActions, null, pi)
         }
         startForeground(3, notification)
@@ -823,7 +823,6 @@ open class PlaybackService : MediaBrowserServiceCompat(), LifecycleOwner, Corout
         }
         val mw = playlistManager.getCurrentMedia()
         if (mw != null) {
-            val coverOnLockscreen = settings.getBoolean(LOCKSCREEN_COVER, true)
             val seekInCompactView = settings.getBoolean(SHOW_SEEK_IN_COMPACT_NOTIFICATION, false)
             val playing = isPlaying
             val sessionToken = mediaSession.sessionToken
@@ -834,15 +833,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), LifecycleOwner, Corout
                 if (isPlayingPopup || !notificationShowing) return@launch
                 try {
                     val title = if (metaData == null) mw.title else metaData.getString(MediaMetadataCompat.METADATA_KEY_TITLE)
-                    var cover = if (coverOnLockscreen && metaData != null)
-                        metaData.getBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART) else null
-                    if (coverOnLockscreen && cover == null)
-                        cover = AudioUtil.readCoverBitmap(Uri.decode(mw.artworkMrl), 256)
-                    if (cover == null || cover.isRecycled)
-                        cover = ctx.getBitmapFromDrawable(R.drawable.ic_no_media)
-
-                    notification = NotificationHelper.createPlaybackNotification(ctx,
-                            canSwitchToVideo(), title, cover, playing, isPausable,
+                    notification = NotificationHelper.createPlaybackNotification(ctx, title, playing, isPausable,
                             isSeekable, speed, isPodcastMode, seekInCompactView, enabledActions,
                             sessionToken, sessionPendingIntent)
                     if (isPlayingPopup) return@launch
