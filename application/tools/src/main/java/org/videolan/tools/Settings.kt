@@ -131,7 +131,6 @@ const val RESULT_RESTART = Activity.RESULT_FIRST_USER + 2
 const val RESULT_RESTART_APP = Activity.RESULT_FIRST_USER + 3
 const val RESULT_UPDATE_ARTISTS = Activity.RESULT_FIRST_USER + 5
 
-const val BETA_WELCOME = "beta_welcome"
 const val CRASH_DONT_ASK_AGAIN = "crash_dont_ask_again"
 
 const val RESUME_PLAYBACK = "resume_playback"
