@@ -29,9 +29,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import org.videolan.libvlc.Dialog
 import org.videolan.medialibrary.interfaces.media.MediaWrapper
-import org.videolan.resources.AppContextProvider
 import org.videolan.vlc.R
-import org.videolan.vlc.gui.dialogs.DeviceDialog
 import org.videolan.vlc.gui.dialogs.NetworkServerDialog
 import org.videolan.vlc.media.MediaUtils
 import org.videolan.vlc.util.showVlcDialog
@@ -51,7 +49,6 @@ class DialogActivity : BaseActivity() {
         when (key) {
             KEY_SERVER -> setupServerDialog()
             KEY_SUBS_DL -> setupSubsDialog()
-            KEY_DEVICE -> setupDeviceDialog()
             KEY_DIALOG -> {
                 dialog?.run {
                     showVlcDialog(this)
@@ -61,15 +58,6 @@ class DialogActivity : BaseActivity() {
             else -> finish()
         }
     }
-
-    private fun setupDeviceDialog() {
-        window.decorView.alpha = 0f
-        val dialog = DeviceDialog()
-        val intent = intent
-        dialog.setDevice(intent.getStringExtra(EXTRA_PATH)!!, intent.getStringExtra(EXTRA_UUID)!!, intent.getBooleanExtra(EXTRA_SCAN, false))
-        dialog.show(supportFragmentManager, "device_dialog")
-    }
-
 
     private fun setupServerDialog() {
         val networkServerDialog = NetworkServerDialog()
@@ -93,7 +81,6 @@ class DialogActivity : BaseActivity() {
         var dialog : Dialog? = null
         const val KEY_SERVER = "serverDialog"
         const val KEY_SUBS_DL = "subsdlDialog"
-        const val KEY_DEVICE = "deviceDialog"
         const val KEY_DIALOG = "vlcDialog"
 
         const val EXTRA_MEDIALIST = "extra_media_list"

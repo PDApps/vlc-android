@@ -86,7 +86,6 @@ import org.videolan.tools.*
 import org.videolan.vlc.BuildConfig
 import org.videolan.vlc.PlaybackService
 import org.videolan.vlc.R
-import org.videolan.vlc.StartActivity
 import org.videolan.vlc.gui.DialogActivity
 import org.videolan.vlc.gui.audio.EqualizerFragment
 import org.videolan.vlc.gui.dialogs.PlaybackSpeedDialog
@@ -2123,7 +2122,6 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
         private const val EXTRA_POSITION = "extra_position"
         private const val EXTRA_DURATION = "extra_duration"
         private const val EXTRA_URI = "extra_uri"
-        const val FROM_EXTERNAL = "from_external"
         const val SWITCHING_VIEW = "switching_view"
         private const val RESULT_CONNECTION_FAILED = Activity.RESULT_FIRST_USER + 1
         private const val RESULT_PLAYBACK_ERROR = Activity.RESULT_FIRST_USER + 2
@@ -2188,7 +2186,7 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
 
         fun getIntent(action: String, context: Context, uri: Uri, title: String?, fromStart: Boolean, openedPosition: Int): Intent {
             val appContext = AppContextProvider.appContext
-            val playerClass = if (appContext is StartActivity.ClassProvider) {
+            val playerClass = if (appContext is ClassProvider) {
                 appContext.playerClass
             } else {
                 VideoPlayerActivity::class.java
