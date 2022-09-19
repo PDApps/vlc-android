@@ -6,7 +6,7 @@
     <PreferenceCategory android:title="@string/video_prefs_category">
         <ListPreference
                 android:key="video_action_switch"
-                android:defaultValue="0"
+                android:defaultValue="1"
                 android:entries="@array/video_app_switch_action_titles"
                 android:entryValues="@array/video_app_switch_action_values"
                 android:summary="@string/video_app_switch_summary"
