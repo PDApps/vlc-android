@@ -211,8 +211,6 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
             return pm.isInteractive
         }
 
-    private var addNextTrack = false
-
     internal val isPlaybackSettingActive: Boolean
         get() = delayDelegate.playbackSetting != IPlaybackSettingsController.DelayState.OFF
 
@@ -1261,64 +1259,9 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
                     if (menuIdx == -1) {
                         val mw = service.currentMediaWrapper ?: return
                         if (event.esChangedType == IMedia.Track.Type.Audio) {
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                val media = medialibrary.findMedia(mw)
-                                var preferredTrack = 0
-                                val preferredAudioLang = settings.getString(AUDIO_PREFERRED_LANGUAGE, "")
-                                if (!preferredAudioLang.isNullOrEmpty()) {
-                                    /** ⚠️limitation: See [LocaleUtil] header comment */
-                                    val allTracks = getCurrentMediaTracks()
-                                    service.audioTracks?.iterator()?.let { audioTracks ->
-                                        while (audioTracks.hasNext()) {
-                                            val next = audioTracks.next()
-                                            val realTrack = allTracks.find { it.id == next.id }
-                                            if (LocaleUtil.getLocaleFromVLC(realTrack?.language
-                                                            ?: "") == preferredAudioLang) {
-                                                preferredTrack = next.id
-                                                break
-                                            }
-                                        }
-                                    }
-                                }
-                                val audioTrack = when (val savedTrack = media.getMetaLong(MediaWrapper.META_AUDIOTRACK).toInt()) {
-                                    0 -> preferredTrack
-                                    else -> savedTrack
-                                }
-                                if (audioTrack != 0 || currentAudioTrack != -2)
-                                    service.setAudioTrack(audioTrack)
-                            }
+                            // Do nothing, audio track is managed when start playing
                         } else if (event.esChangedType == IMedia.Track.Type.Text) {
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                val media = medialibrary.findMedia(mw)
-                                var preferredTrack = 0
-                                val preferredSpuLang = settings.getString(SUBTITLE_PREFERRED_LANGUAGE, "")
-                                if (!preferredSpuLang.isNullOrEmpty()) {
-                                    val allTracks = getCurrentMediaTracks()
-                                    service.spuTracks?.iterator()?.let { spuTracks ->
-                                        while (spuTracks.hasNext()) {
-                                            val next = spuTracks.next()
-                                            val realTrack = allTracks.find {it.id == next.id }
-                                            if (LocaleUtil.getLocaleFromVLC(realTrack?.language
-                                                            ?: "") == preferredSpuLang) {
-                                                preferredTrack = next.id
-                                                break
-                                            }
-                                        }
-                                    }
-                                }
-                                val spuTrack = when (val savedTrack = media.getMetaLong(MediaWrapper.META_SUBTITLE_TRACK).toInt()) {
-                                    0 -> preferredTrack
-                                    else -> savedTrack
-                                }
-                                if (addNextTrack) {
-                                    val tracks = service.spuTracks
-                                    if (!(tracks as Array<MediaPlayer.TrackDescription>).isNullOrEmpty()) service.setSpuTrack(tracks[tracks.size - 1].id)
-                                    addNextTrack = false
-                                } else if (spuTrack != 0 || currentSpuTrack != -2) {
-                                    service.setSpuTrack(spuTrack)
-                                    lastSpuTrack = -2
-                                }
-                            }
+                            // Do nothing, subs track is managed when start playing
                         }
                     }
                     if (menuIdx == -1 && event.esChangedType == IMedia.Track.Type.Video) {

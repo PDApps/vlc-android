@@ -549,7 +549,7 @@ open class PlaylistManager(val service: PlaybackService) : MediaWrapperList.Even
     fun setSpuTrack(index: Int) {
         if (!player.setSpuTrack(index)) return
         val media = getCurrentMedia() ?: return
-        if (media.id != 0L) launch(Dispatchers.IO) { media.setLongMeta(MediaWrapper.META_SUBTITLE_TRACK, index.toLong()) }
+        media.spuTrack = index
     }
 
     fun setAudioDelay(delay: Long) {
@@ -577,7 +577,7 @@ open class PlaylistManager(val service: PlaybackService) : MediaWrapperList.Even
                 player.setAudioDelay(savedDelay)
             }
 
-            player.setSpuTrack(media.getMetaLong(MediaWrapper.META_SUBTITLE_TRACK).toInt())
+            player.setSpuTrack(media.spuTrack)
             player.setSpuDelay(media.getMetaLong(MediaWrapper.META_SUBTITLE_DELAY))
             val speed = media.speed
             if (speed > 0) {
