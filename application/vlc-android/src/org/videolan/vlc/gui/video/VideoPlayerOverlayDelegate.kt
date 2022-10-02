@@ -231,9 +231,9 @@ open class VideoPlayerOverlayDelegate (private val player: VideoPlayerActivity) 
                 VideoTracksDialog.TrackType.AUDIO -> {
                     player.service?.let { service ->
                         service.setAudioTrack(trackID)
+                        service.currentMediaWrapper?.audioTrack = trackID
                         runIO {
-                            val mw = player.medialibrary.findMedia(service.currentMediaWrapper)
-                            if (mw != null && mw.id != 0L) mw.setLongMeta(MediaWrapper.META_AUDIOTRACK, trackID.toLong())
+                            player.service?.playlistManager?.saveMediaMeta()
                         }
                     }
                 }
