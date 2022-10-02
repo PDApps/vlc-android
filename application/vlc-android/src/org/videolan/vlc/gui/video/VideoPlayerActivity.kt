@@ -211,8 +211,6 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
             return pm.isInteractive
         }
 
-    private var addNextTrack = false
-
     internal val isPlaybackSettingActive: Boolean
         get() = delayDelegate.playbackSetting != IPlaybackSettingsController.DelayState.OFF
 
@@ -1285,11 +1283,7 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
                                     0 -> preferredTrack
                                     else -> savedTrack
                                 }
-                                if (addNextTrack) {
-                                    val tracks = service.spuTracks
-                                    if (!(tracks as Array<MediaPlayer.TrackDescription>).isNullOrEmpty()) service.setSpuTrack(tracks[tracks.size - 1].id)
-                                    addNextTrack = false
-                                } else if (spuTrack != 0 || currentSpuTrack != -2) {
+                                if (spuTrack != 0 || currentSpuTrack != -2) {
                                     service.setSpuTrack(spuTrack)
                                     lastSpuTrack = -2
                                 }
