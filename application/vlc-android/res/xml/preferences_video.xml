@@ -12,7 +12,7 @@
             android:title="@string/save_audiodelay_title"/>
     <CheckBoxPreference
             app:singleLineTitle="false"
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="save_brightness"
             android:summary="@string/save_brightness_summary"
             android:title="@string/save_brightness_title"/>
