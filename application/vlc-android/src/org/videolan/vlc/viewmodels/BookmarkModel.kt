@@ -42,7 +42,7 @@ open class BookmarkModel : ViewModel(), PlaybackService.Callback {
 
     val dataset = LiveDataset<Bookmark>()
 
-    open fun refresh() {
+    open fun refresh(fileHash: ByteArray) {
     }
 
     companion object {
@@ -57,7 +57,7 @@ open class BookmarkModel : ViewModel(), PlaybackService.Callback {
     }
 
     override fun onMediaPlayerEvent(event: MediaPlayer.Event) {
-        if (event.type == MediaPlayer.Event.Opening) refresh()
+        if (event.type == MediaPlayer.Event.Opening) refresh(byteArrayOf())
     }
 
     open fun delete(bookmark: Bookmark) {

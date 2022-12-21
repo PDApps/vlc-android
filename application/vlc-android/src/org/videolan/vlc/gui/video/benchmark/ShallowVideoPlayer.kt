@@ -40,6 +40,9 @@ open class ShallowVideoPlayer : VideoPlayerActivity() {
         return true
     }
 
+    override val fileHash: ByteArray
+        get() = byteArrayOf()
+
     override fun onTrackballEvent(event: MotionEvent): Boolean {
         return true
     }

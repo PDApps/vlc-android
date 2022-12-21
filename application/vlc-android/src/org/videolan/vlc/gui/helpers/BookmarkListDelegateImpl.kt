@@ -118,9 +118,9 @@ open class BookmarkListDelegateImpl(val activity: VideoPlayerActivity, val servi
 
                 if (bookmarkList.isNotEmpty()) emptyView.setGone() else emptyView.setVisible()
             }
-            bookmarkModel.refresh()
+            bookmarkModel.refresh(activity.fileHash)
         }
-        bookmarkModel.refresh()
+        bookmarkModel.refresh(activity.fileHash)
         rootView.setVisible()
         markerContainer.setVisible()
         visibilityListener.invoke()

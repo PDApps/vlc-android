@@ -153,6 +153,9 @@ class BenchActivity : ShallowVideoPlayer() {
         super.loadMedia(fromStart, true)
     }
 
+    override val fileHash: ByteArray
+        get() = byteArrayOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         /* Crash handler setup */
         StartActivityOnCrash.setUp(this)

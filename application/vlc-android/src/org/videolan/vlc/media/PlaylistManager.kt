@@ -384,7 +384,7 @@ open class PlaylistManager(val service: PlaybackService) : MediaWrapperList.Even
                 return
             }
             if (!isBenchmark && isAudio) {
-                VideoPlayerActivity.startOpened(ctx, mw.uri, currentIndex)
+                VideoPlayerActivity.startOpened(ctx, mw, currentIndex)
             }
             val title = mw.getMetaLong(MediaWrapper.META_TITLE)
             if (title > 0) uri = "$uri#$title".toUri()
@@ -422,7 +422,7 @@ open class PlaylistManager(val service: PlaybackService) : MediaWrapperList.Even
             service.onNewPlayback()
         } else { //Start VideoPlayer for first video, it will trigger playIndex when ready.
             if (player.isPlaying()) player.stop()
-            startPlayer(ctx, mw.uri, currentIndex)
+            startPlayer(ctx, mw, currentIndex)
         }
     }
 
@@ -450,14 +450,14 @@ open class PlaylistManager(val service: PlaybackService) : MediaWrapperList.Even
                     VideoPlayerActivity.getIntent(PLAY_FROM_SERVICE,
                             media, false, currentIndex))
         } else if (!player.switchToVideo) { //Start the video player
-            startPlayer(uri = media.uri)
+            startPlayer(media = media)
             if (!hasRenderer) player.switchToVideo = true
         }
         return true
     }
 
-    protected open fun startPlayer(context: Context = AppContextProvider.appContext, uri: Uri, openedPosition: Int = currentIndex) {
-        VideoPlayerActivity.startOpened(AppContextProvider.appContext, uri, openedPosition)
+    protected open fun startPlayer(context: Context = AppContextProvider.appContext, media: MediaWrapper, openedPosition: Int = currentIndex) {
+        VideoPlayerActivity.startOpened(AppContextProvider.appContext, media, openedPosition)
     }
 
     fun setVideoTrackEnabled(enabled: Boolean) {

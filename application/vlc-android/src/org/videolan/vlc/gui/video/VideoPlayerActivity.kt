@@ -113,8 +113,9 @@ interface ServiceLauncher {
 @Suppress("DEPRECATION")
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
-open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackService.Callback, OnClickListener, OnLongClickListener, StoragePermissionsDelegate.CustomActionController, TextWatcher, IDialogManager, KeycodeListener {
+abstract class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackService.Callback, OnClickListener, OnLongClickListener, StoragePermissionsDelegate.CustomActionController, TextWatcher, IDialogManager, KeycodeListener {
 
+    abstract val fileHash: ByteArray
     var hasPhysicalNotch: Boolean = false
     private var subtitlesExtraPath: String? = null
     private lateinit var startedScope: CoroutineScope
@@ -2105,42 +2106,31 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
         const val KEY_BLUETOOTH_DELAY = "key_bluetooth_delay"
 
         private const val LOADING_ANIMATION_DELAY = 1000
+        public const val FILE_HASH = "file_hash"
 
         @Volatile
         internal var sDisplayRemainingTime: Boolean = false
 
         private var clone: Boolean? = null
 
-        fun start(context: Context, uri: Uri) {
-            start(context, uri, null, false, -1)
+        fun startOpened(context: Context, media: MediaWrapper, openedPosition: Int) {
+            start(context, media, null, false, openedPosition)
         }
 
-        private fun start(context: Context, uri: Uri, fromStart: Boolean) {
-            start(context, uri, null, fromStart, -1)
-        }
-
-        private fun start(context: Context, uri: Uri, title: String) {
-            start(context, uri, title, false, -1)
-        }
-
-        fun startOpened(context: Context, uri: Uri, openedPosition: Int) {
-            start(context, uri, null, false, openedPosition)
-        }
-
-        private fun start(context: Context, uri: Uri, title: String?, fromStart: Boolean, openedPosition: Int) {
-            val intent = getIntent(context, uri, title, fromStart, openedPosition)
+        private fun start(context: Context, media: MediaWrapper, title: String?, fromStart: Boolean, openedPosition: Int) {
+            val intent = getIntent(context, media, title, fromStart, openedPosition)
             context.startActivity(intent)
         }
 
         fun getIntent(action: String, mw: MediaWrapper, fromStart: Boolean, openedPosition: Int): Intent {
-            return getIntent(action, AppContextProvider.appContext, mw.uri, mw.title, fromStart, openedPosition)
+            return getIntent(action, AppContextProvider.appContext, mw, mw.title, fromStart, openedPosition)
         }
 
-        fun getIntent(context: Context, uri: Uri, title: String?, fromStart: Boolean, openedPosition: Int): Intent {
-            return getIntent(PLAY_FROM_VIDEOGRID, context, uri, title, fromStart, openedPosition)
+        fun getIntent(context: Context, mw: MediaWrapper, title: String?, fromStart: Boolean, openedPosition: Int): Intent {
+            return getIntent(PLAY_FROM_VIDEOGRID, context, mw, title, fromStart, openedPosition)
         }
 
-        fun getIntent(action: String, context: Context, uri: Uri, title: String?, fromStart: Boolean, openedPosition: Int): Intent {
+        fun getIntent(action: String, context: Context, mw: MediaWrapper, title: String?, fromStart: Boolean, openedPosition: Int): Intent {
             val appContext = AppContextProvider.appContext
             val playerClass = if (appContext is ClassProvider) {
                 appContext.playerClass
@@ -2149,9 +2139,10 @@ open class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, PlaybackS
             }
             val intent = Intent(context, playerClass)
             intent.action = action
-            intent.putExtra(PLAY_EXTRA_ITEM_LOCATION, uri)
+            intent.putExtra(PLAY_EXTRA_ITEM_LOCATION, mw.uri)
             intent.putExtra(PLAY_EXTRA_ITEM_TITLE, title)
             intent.putExtra(PLAY_EXTRA_FROM_START, fromStart)
+            intent.putExtra(FILE_HASH, mw.fileHash)
 
             if (openedPosition != -1 || context !is Activity) {
                 if (openedPosition != -1)

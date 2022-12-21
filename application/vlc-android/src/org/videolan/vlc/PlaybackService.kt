@@ -1487,7 +1487,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), LifecycleOwner, Corout
         val wasOnRenderer = hasRenderer()
         if (wasOnRenderer && !hasRenderer() && canSwitchToVideo())
             VideoPlayerActivity.startOpened(applicationContext,
-                    playlistManager.getCurrentMedia()!!.uri, playlistManager.currentIndex)
+                    playlistManager.getCurrentMedia()!!, playlistManager.currentIndex)
         playlistManager.setRenderer(item)
         if (!wasOnRenderer && item != null) audioFocusHelper.changeAudioFocus(false)
         else if (wasOnRenderer && item == null && isPlaying) audioFocusHelper.changeAudioFocus(true)

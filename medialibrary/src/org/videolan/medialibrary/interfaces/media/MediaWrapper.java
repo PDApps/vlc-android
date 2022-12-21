@@ -90,6 +90,7 @@ public abstract class MediaWrapper extends MediaLibraryItem implements Parcelabl
     protected boolean mThumbnailGenerated;
     private boolean mIsPresent = true;
 
+    public byte[] fileHash = new byte[0];
     protected final Uri mUri;
     protected String mFilename;
     protected long mTime = -1;
@@ -121,37 +122,6 @@ public abstract class MediaWrapper extends MediaLibraryItem implements Parcelabl
     public abstract BookmarkBase addBookmark(long time);
     public abstract boolean removeBookmark(long time);
     public abstract boolean removeAllBookmarks();
-
-    /**
-     * Create a new MediaWrapper
-     *
-     * @param mrl Should not be null.
-     */
-    public MediaWrapper(long id, String mrl, long time, float position, long length, int type, String title,
-                        String filename,
-                        int width, int height, int audio, int spu,
-                        long lastModified, long seen, boolean isThumbnailGenerated, boolean isPresent) {
-        super();
-        if (TextUtils.isEmpty(mrl)) throw new IllegalArgumentException("uri was empty");
-
-        mUri = Uri.parse(manageVLCMrl(mrl));
-        mId = id;
-        mFilename = filename;
-        mIsPresent = isPresent;
-        init(time, position, length, type, null, title, width, height, audio, spu,
-                lastModified, seen, isPresent, null);
-        final StringBuilder sb = new StringBuilder();
-        if (type == TYPE_AUDIO) {
-
-        } else if (type == TYPE_VIDEO) {
-            Tools.setMediaDescription(this);
-        }
-
-        if (sb.length() > 0)
-            mDescription = sb.toString();
-        defineType();
-        mThumbnailGenerated = isThumbnailGenerated;
-    }
 
     private String manageVLCMrl(String mrl) {
         if (!mrl.isEmpty() && mrl.charAt(0) == '/') {
@@ -560,6 +530,9 @@ public abstract class MediaWrapper extends MediaLibraryItem implements Parcelabl
                 in.readLong(),
                 in.readInt() == 1,
                 in.createTypedArray(PSlave.CREATOR));
+        int arraySize = in.readInt();
+        fileHash = new byte[arraySize];
+        in.readByteArray(fileHash);
     }
 
     @Override
@@ -588,6 +561,9 @@ public abstract class MediaWrapper extends MediaLibraryItem implements Parcelabl
             dest.writeTypedArray(pslaves, flags);
         } else
             dest.writeTypedArray(null, flags);
+
+        dest.writeInt(fileHash.length);
+        dest.writeByteArray(fileHash);
     }
 
     public static final Parcelable.Creator<MediaWrapper> CREATOR = new Parcelable.Creator<MediaWrapper>() {
