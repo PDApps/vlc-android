@@ -711,7 +711,9 @@ abstract class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, Playb
         service?.removeCallback(this)
         service = null
         // Clear Intent to restore playlist on activity restart
+        val tempFileHash = fileHash
         intent = Intent()
+        intent.putExtra(FILE_HASH, tempFileHash)
         handler.removeCallbacksAndMessages(null)
         previousMediaPath = null
     }
@@ -1774,6 +1776,7 @@ abstract class VideoPlayerActivity : AppCompatActivity(), ServiceLauncher, Playb
                 if (wasPaused) media?.addFlags(MediaWrapper.MEDIA_PAUSED)
                 if (intent.hasExtra(PLAY_DISABLE_HARDWARE)) media?.addFlags(MediaWrapper.MEDIA_NO_HWACCEL)
                 media!!.removeFlags(MediaWrapper.MEDIA_FORCE_AUDIO)
+                media.fileHash = fileHash
                 media.addFlags(MediaWrapper.MEDIA_VIDEO)
                 if (fromStart) media.addFlags(MediaWrapper.MEDIA_FROM_START)
 
