@@ -217,16 +217,24 @@ open class PlaybackService : MediaBrowserServiceCompat(), LifecycleOwner, Corout
         get() {
             return when {
                 playlistManager.player.isVideoPlaying() -> {//PIP
-                    val notificationIntent = Intent(this, playerClass).apply { putExtra(VideoPlayerActivity.SWITCHING_VIEW, true) }
+                    val notificationIntent = Intent(this, playerClass).apply {
+                        putExtra(VideoPlayerActivity.SWITCHING_VIEW, true)
+                        putExtra(VideoPlayerActivity.FILE_HASH, playlistManager.getCurrentMedia()?.fileHash)
+                    }
                     PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                 }
                 playlistManager.videoBackground || canSwitchToVideo() && !currentMediaHasFlag(MediaWrapper.MEDIA_FORCE_AUDIO) -> {//resume video playback
                     /* Resume VideoPlayerActivity from ACTION_REMOTE_SWITCH_VIDEO intent */
-                    val notificationIntent = Intent(ACTION_REMOTE_SWITCH_VIDEO)
+                    val notificationIntent = Intent(ACTION_REMOTE_SWITCH_VIDEO).apply {
+                        putExtra(VideoPlayerActivity.FILE_HASH, playlistManager.getCurrentMedia()?.fileHash)
+                    }
                     PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                 }
                 else -> { /* Show audio player */
-                    val notificationIntent = Intent(this, playerClass).apply { putExtra(VideoPlayerActivity.SWITCHING_VIEW, true) }
+                    val notificationIntent = Intent(this, playerClass).apply {
+                        putExtra(VideoPlayerActivity.SWITCHING_VIEW, true)
+                        putExtra(VideoPlayerActivity.FILE_HASH, playlistManager.getCurrentMedia()?.fileHash)
+                    }
                     PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
                 }
             }
